@@ -12,19 +12,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var dictionary = DictionaryLoader.loadDictionary(this)
+        var dictionaryEntries = DictionaryLoader.loadDictionary(this)
 
         val editText = findViewById<EditText>(R.id.search_input)
         val button = findViewById<Button>(R.id.search_button)
         val resultView = findViewById<TextView>(R.id.textViewDefinition)
 
         button.setOnClickListener {
-            val input = editText.text.toString().trim().lowercase()
-            val definition = dictionary[input]
-            if (definition != null) {
-                resultView.text = "$definition"
+            val query = editText.text.toString().trim().lowercase()
+            val entry = dictionaryEntries.find { it.word == query }
+
+            if (entry != null) {
+                resultView.text = entry.definition
             } else {
-                resultView.text = "Không tìm thấy từ '$input'"
+                resultView.text = "Không tìm thấy từ '$query'"
             }
         }
     }

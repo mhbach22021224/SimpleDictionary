@@ -25,6 +25,7 @@
             android:hint="Search word here"
             android:layout_toLeftOf="@id/search_button"
             android:id="@+id/search_input"
+            android:background="@drawable/rounded_corner"
             android:textSize="18dp"
             android:padding="12dp"/>
 
