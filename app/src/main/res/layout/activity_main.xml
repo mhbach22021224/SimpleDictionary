@@ -19,7 +19,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <EditText
+        <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Search word here"
@@ -27,7 +27,8 @@
             android:id="@+id/search_input"
             android:background="@drawable/rounded_corner"
             android:textSize="18dp"
-            android:padding="12dp"/>
+            android:padding="12dp"
+            android:completionThreshold="1"/>
 
         <Button
             android:layout_width="100dp"
@@ -48,11 +49,29 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/textViewDefinition"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:paddingTop="16dp"/>
+        android:layout_height="200dp"
+        android:fillViewport="true">
+
+        <TextView
+            android:id="@+id/textViewDefinition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:padding="8dp" />
+    </ScrollView>
+
+    <ListView
+        android:id="@+id/history_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"
+        android:background="#F5F5F5"
+        />
+
 
 </LinearLayout>
