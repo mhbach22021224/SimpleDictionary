@@ -2,22 +2,26 @@ package com.example.simpledictionary
 
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
 class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
-
     private lateinit var tts: TextToSpeech
     private var currentWord: String = ""
     private lateinit var dictionaryEntries: List<DictionaryEntry>
     private lateinit var historyAdapter: ArrayAdapter<String>
     private val searchHistory = mutableListOf<String>()
     private lateinit var speakButton: Button  // ✅ Khai báo biến speakButton
+    private lateinit var tvSynonyms: TextView
+    private lateinit var tvAntonyms: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        tvSynonyms = findViewById<TextView>(R.id.textViewSynonyms)
+        tvAntonyms = findViewById<TextView>(R.id.textViewAntonyms)
 
         tts = TextToSpeech(this, this)
 
@@ -75,6 +79,14 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             searchAndDisplay(selectedWord, resultView)
         }
 
+        autoCompleteTextView.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                historyListView.visibility = if (s.isNullOrEmpty()) View.VISIBLE else View.GONE
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+
         searchButton.setOnClickListener {
             val query = autoCompleteTextView.text.toString().trim().lowercase()
             currentWord = query // ✅ lưu lại từ để phát âm
@@ -104,15 +116,27 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         val entry = dictionaryEntries.find { it.word == query }
         if (entry != null) {
             resultView.text = entry.definition
+            tvSynonyms.text = "Đồng nghĩa: (đang tải...)"
+            tvAntonyms.text = "Trái nghĩa: (đang tải...)"
 
             if (!searchHistory.contains(query)) {
                 searchHistory.add(0, query)
                 historyAdapter.notifyDataSetChanged()
             }
+
+            DictionaryEnricher.enrichWithSynonymsAntonyms(entry) { enriched ->
+                runOnUiThread {
+                    tvSynonyms.text = "Đồng nghĩa: ${if (enriched.synonyms.isEmpty()) "Không có" else enriched.synonyms.joinToString(", ")}"
+                    tvAntonyms.text = "Trái nghĩa: ${if (enriched.antonyms.isEmpty()) "Không có" else enriched.antonyms.joinToString(", ")}"
+                }
+            }
         } else {
             resultView.text = "Không tìm thấy từ '$query'"
+            tvSynonyms.text = ""
+            tvAntonyms.text = ""
         }
     }
+
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
@@ -136,4 +160,5 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         }
         super.onDestroy()
     }
+
 }
